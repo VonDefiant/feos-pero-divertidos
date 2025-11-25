@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Amigo Secreto - Feos pero divertidos 🎁">
+    <title>Amigo Secreto 🎁</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&family=Caveat:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #d4145a;
+            --secondary: #fbb034;
+            --accent: #009688;
+            --dark: #1a1a2e;
+            --light: #fff5f5;
+            --success: #4caf50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .app-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px 32px;
+            box-shadow: 
+                0 20px 60px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+            position: relative;
+            overflow: hidden;
+            animation: slideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+        }
+
+        .title {
+            font-family: 'Caveat', cursive;
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 0px var(--secondary);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 24px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .label {
+            display: block;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input, .select {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .input:focus, .select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(212, 20, 90, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .input-small {
+            padding: 12px;
+            font-size: 14px;
+        }
+
+        .select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23d4145a' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            padding-right: 48px;
+        }
+
+        .button {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .button span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .button-primary {
+            background: linear-gradient(135deg, var(--primary), #a8104a);
+            color: white;
+            box-shadow: 0 8px 24px rgba(212, 20, 90, 0.4);
+        }
+
+        .button-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(212, 20, 90, 0.5);
+        }
+
+        .button-primary:active {
+            transform: translateY(0);
+        }
+
+        .button-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            margin-top: 12px;
+        }
+
+        .button-secondary:hover {
+            background: var(--light);
+        }
+
+        .code-display {
+            background: linear-gradient(135deg, var(--accent), #00796b);
+            color: white;
+            padding: 24px;
+            border-radius: 16px;
+            text-align: center;
+            margin: 24px 0;
+            box-shadow: 0 8px 24px rgba(0, 150, 136, 0.3);
+        }
+
+        .code-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .code-value {
+            font-family: 'Courier New', monospace;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 4px;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, var(--secondary), #f39c12);
+            padding: 32px;
+            border-radius: 20px;
+            text-align: center;
+            margin-top: 24px;
+            box-shadow: 0 12px 32px rgba(251, 176, 52, 0.4);
+            animation: revealResult 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes revealResult {
+            from {
+                opacity: 0;
+                transform: rotateX(90deg) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: rotateX(0) scale(1);
+            }
+        }
+
+        .result-label {
+            color: white;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+            opacity: 0.95;
+        }
+
+        .result-name {
+            color: white;
+            font-size: 36px;
+            font-weight: 900;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            margin: 8px 0;
+        }
+
+        .result-emoji {
+            font-size: 64px;
+            margin: 16px 0;
+            animation: rotate 2s ease-in-out;
+        }
+
+        @keyframes rotate {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+
+        .info-text {
+            background: var(--light);
+            padding: 16px;
+            border-radius: 12px;
+            margin: 16px 0;
+            font-size: 14px;
+            color: #666;
+            border-left: 4px solid var(--primary);
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 16px;
+            border-radius: 12px;
+            margin: 16px 0;
+            border-left: 4px solid #c62828;
+            font-size: 14px;
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .participants-status {
+            margin: 24px 0;
+        }
+
+        .status-title {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .names-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .copy-button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .copy-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .sync-badge {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--success);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-block;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 600px) {
+            .card {
+                padding: 32px 24px;
+            }
+            
+            .title {
+                font-size: 40px;
+            }
+            
+            .result-name {
+                font-size: 28px;
+            }
+
+            .names-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root" class="app-container">
+        <!-- Setup View -->
+        <div id="setupView" class="card">
+            <h1 class="title">🎁 Amigo Secreto</h1>
+            <p class="subtitle">Feos pero divertidos 😄</p>
+            <p style="text-align: center; color: #999; font-size: 13px; margin-bottom: 24px;">Configura los participantes</p>
+
+            <div class="info-text">
+                <strong>📝 Instrucciones:</strong><br>
+                1. Ingresa los nombres de todos los participantes (mínimo 3)<br>
+                2. Se generará un código único<br>
+                3. Comparte el código UNA SOLA VEZ<br>
+                4. Todos usan el mismo código y se sincroniza automáticamente cada 3 segundos ✨
+            </div>
+
+            <div class="form-group">
+                <label class="label">Nombres de participantes</label>
+                <div class="names-grid" id="namesGrid">
+                    <input type="text" class="input input-small" placeholder="Nombre 1">
+                    <input type="text" class="input input-small" placeholder="Nombre 2">
+                    <input type="text" class="input input-small" placeholder="Nombre 3">
+                </div>
+                <button class="button button-secondary" onclick="app.addNameField()">
+                    <span>➕ Agregar más participantes</span>
+                </button>
+            </div>
+
+            <div id="setupError" class="error hidden"></div>
+
+            <button class="button button-primary" onclick="app.createSession()">
+                <span>✨ Crear Sesión</span>
+            </button>
+
+            <div style="margin: 24px 0; text-align: center; color: #999;">
+                ───── o ─────
+            </div>
+
+            <button class="button button-secondary" onclick="app.showJoin()">
+                <span>🚪 Unirse a Sesión Existente</span>
+            </button>
+        </div>
+
+        <!-- Join View -->
+        <div id="joinView" class="card hidden">
+            <h1 class="title">🎁 Amigo Secreto</h1>
+            <p class="subtitle">Feos pero divertidos 😄</p>
+            <p style="text-align: center; color: #999; font-size: 13px; margin-bottom: 24px;">Únete a una sesión existente</p>
+
+            <div class="info-text">
+                <strong>💡 Importante:</strong> Ingresa el código que te compartieron. Todos usan el mismo código y las asignaciones se sincronizan automáticamente cada 3 segundos.
+            </div>
+
+            <div class="form-group">
+                <label class="label">Código de Sesión (Bin ID)</label>
+                <input
+                    type="text"
+                    id="joinCode"
+                    class="input"
+                    placeholder="Ej: 67651ab5ad19ca34f8d3c8b9"
+                    style="text-align: center; font-size: 16px; font-family: monospace;"
+                />
+            </div>
+
+            <div id="joinError" class="error hidden"></div>
+
+            <button class="button button-primary" onclick="app.joinSession()">
+                <span>🚪 Unirse a Sesión</span>
+            </button>
+
+            <button class="button button-secondary" onclick="app.showSetup()">
+                <span>← Volver</span>
+            </button>
+        </div>
+
+        <!-- Session View -->
+        <div id="sessionView" class="card hidden">
+            <h1 class="title">🎁 Amigo Secreto</h1>
+            <p class="subtitle">Feos pero divertidos 😄</p>
+            
+            <div class="code-display">
+                <div class="code-label">Código de Sesión (Bin ID)</div>
+                <div class="code-value" id="sessionCode" style="font-size: 14px; word-break: break-all;"></div>
+                <div class="sync-badge">✓ Sincronizado cada 3 seg</div>
+                <button class="copy-button" onclick="app.copyCode()">📋 Copiar Código</button>
+            </div>
+
+            <div class="info-text">
+                ✨ Comparte este código con los demás. Se actualiza automáticamente cada 3 segundos cuando alguien revela su amigo secreto.
+            </div>
+
+            <div id="selectSection">
+                <div class="form-group">
+                    <label class="label">Selecciona tu nombre</label>
+                    <select id="personSelect" class="select" onchange="app.clearError()">
+                        <option value="">-- Elige tu nombre --</option>
+                    </select>
+                </div>
+
+                <div id="sessionError" class="error hidden"></div>
+
+                <button class="button button-primary" onclick="app.assignSecretFriend()">
+                    <span>🎲 Revelar Mi Amigo Secreto</span>
+                </button>
+            </div>
+
+            <div id="resultSection" class="hidden">
+                <div class="result-card">
+                    <div class="result-emoji">🎉</div>
+                    <div class="result-label">Tu amigo secreto es:</div>
+                    <div class="result-name" id="revealedFriend"></div>
+                    <div style="margin-top: 20px; font-size: 14px; color: white; opacity: 0.9;">
+                        ¡Guarda este nombre en secreto! 🤫
+                    </div>
+                </div>
+            </div>
+
+            <div class="participants-status">
+                <div class="status-title">Estado de Participantes:</div>
+                <div>
+                    <strong>Asignados:</strong> <span id="assignedCount">0</span> de <span id="totalCount">0</span>
+                </div>
+                <div>
+                    <strong>Disponibles para asignar:</strong> <span id="availableCount">0</span>
+                </div>
+            </div>
+
+            <button class="button button-secondary" onclick="app.resetSession()">
+                <span>🔄 Nueva Sesión</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Configuración de JSONBin.io
+        const JSONBIN_CONFIG = {
+            masterKey: '$2a$10$xUFXr.ULT5VmXu5lrWXW0OP2uQWuHoTe3SVy2Gc6htTAp/HD1zdNO',
+            accessKey: '$2a$10$tjJJemGEMGj0/SMP4AiIiOnqnd6gs6oaFZxfGN8XJS7XIOPiQQO5C',
+            apiUrl: 'https://api.jsonbin.io/v3/b'
+        };
+
+        // REGLAS DE EXCLUSIÓN
+        const EXCLUSIONS = {
+            'Diego': ['Amely', 'Darcy'],
+            'Darcy': ['Amely', 'Diego'],
+            'Amely': ['Diego', 'Darcy'],
+            'Carlos': ['Gaby'],
+            'Gaby': ['Carlos']
+        };
+
+        // Aplicación
+        const app = {
+            binId: null,
+            sessionData: null,
+            pollingInterval: null,
+
+            async createBin(data) {
+                const response = await fetch(JSONBIN_CONFIG.apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': JSONBIN_CONFIG.masterKey,
+                        'X-Bin-Private': 'false'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                return result.metadata.id;
+            },
+
+            async readBin(binId) {
+                const response = await fetch(`${JSONBIN_CONFIG.apiUrl}/${binId}/latest`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Master-Key': JSONBIN_CONFIG.masterKey
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                return result.record;
+            },
+
+            async updateBin(binId, data) {
+                const response = await fetch(`${JSONBIN_CONFIG.apiUrl}/${binId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': JSONBIN_CONFIG.masterKey
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                return result.record;
+            },
+
+            addNameField() {
+                const grid = document.getElementById('namesGrid');
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'input input-small';
+                input.placeholder = `Nombre ${grid.children.length + 1}`;
+                grid.appendChild(input);
+            },
+
+            getNames() {
+                const inputs = document.querySelectorAll('#namesGrid input');
+                const names = [];
+                inputs.forEach(input => {
+                    const name = input.value.trim();
+                    if (name) names.push(name);
+                });
+                return names;
+            },
+
+            showView(viewName) {
+                document.getElementById('setupView').classList.add('hidden');
+                document.getElementById('joinView').classList.add('hidden');
+                document.getElementById('sessionView').classList.add('hidden');
+                document.getElementById(viewName + 'View').classList.remove('hidden');
+            },
+
+            showError(elementId, message) {
+                const errorElement = document.getElementById(elementId);
+                errorElement.textContent = message;
+                errorElement.classList.remove('hidden');
+            },
+
+            hideError(elementId) {
+                document.getElementById(elementId).classList.add('hidden');
+            },
+
+            clearError() {
+                this.hideError('sessionError');
+            },
+
+            async createSession() {
+                const names = this.getNames();
+
+                if (names.length < 3) {
+                    this.showError('setupError', 'Debes ingresar al menos 3 participantes');
+                    return;
+                }
+
+                const uniqueNames = new Set(names);
+                if (uniqueNames.size !== names.length) {
+                    this.showError('setupError', 'Hay nombres duplicados.');
+                    return;
+                }
+
+                this.sessionData = {
+                    participants: names,
+                    assignments: {},
+                    available: names,
+                    createdAt: Date.now()
+                };
+
+                try {
+                    this.binId = await this.createBin(this.sessionData);
+                    this.startPolling();
+                    this.updateSessionView();
+                    this.showView('session');
+                    this.hideError('setupError');
+                } catch (error) {
+                    this.showError('setupError', 'Error al crear la sesión: ' + error.message);
+                }
+            },
+
+            startPolling() {
+                if (this.pollingInterval) {
+                    clearInterval(this.pollingInterval);
+                }
+
+                this.pollingInterval = setInterval(async () => {
+                    if (this.binId) {
+                        try {
+                            const data = await this.readBin(this.binId);
+                            this.sessionData = data;
+                            this.updateSessionView();
+                        } catch (error) {
+                            console.error('Error en polling:', error);
+                        }
+                    }
+                }, 3000);
+            },
+
+            stopPolling() {
+                if (this.pollingInterval) {
+                    clearInterval(this.pollingInterval);
+                    this.pollingInterval = null;
+                }
+            },
+
+            updateSessionView() {
+                if (!this.sessionData || !this.binId) return;
+
+                document.getElementById('sessionCode').textContent = this.binId;
+                
+                const select = document.getElementById('personSelect');
+                const currentValue = select.value;
+                select.innerHTML = '<option value="">-- Elige tu nombre --</option>';
+                
+                const availableToSelect = this.sessionData.participants.filter(
+                    p => !this.sessionData.assignments[p]
+                );
+                
+                availableToSelect.forEach(person => {
+                    const option = document.createElement('option');
+                    option.value = person;
+                    option.textContent = person;
+                    select.appendChild(option);
+                });
+
+                select.value = currentValue;
+
+                document.getElementById('assignedCount').textContent = Object.keys(this.sessionData.assignments).length;
+                document.getElementById('totalCount').textContent = this.sessionData.participants.length;
+                document.getElementById('availableCount').textContent = this.sessionData.available.length;
+
+                if (currentValue && this.sessionData.assignments[currentValue]) {
+                    this.showResult(this.sessionData.assignments[currentValue]);
+                }
+            },
+
+            showJoin() {
+                this.showView('join');
+                this.hideError('joinError');
+            },
+
+            showSetup() {
+                this.showView('setup');
+                this.hideError('setupError');
+            },
+
+            async joinSession() {
+                const code = document.getElementById('joinCode').value.trim();
+                
+                if (!code) {
+                    this.showError('joinError', 'Por favor ingresa un código');
+                    return;
+                }
+
+                try {
+                    const data = await this.readBin(code);
+                    this.binId = code;
+                    this.sessionData = data;
+                    this.startPolling();
+                    this.updateSessionView();
+                    this.showView('session');
+                    this.hideError('joinError');
+                } catch (error) {
+                    this.showError('joinError', 'Código no encontrado o error al conectar: ' + error.message);
+                }
+            },
+
+            copyCode() {
+                const code = document.getElementById('sessionCode').textContent;
+                navigator.clipboard.writeText(code).then(() => {
+                    alert('¡Código copiado!\n\n' + code);
+                }).catch(() => {
+                    alert('Código de sesión:\n\n' + code);
+                });
+            },
+
+            getValidTargets(person) {
+                const targets = this.sessionData.available.filter(target => {
+                    if (target === person) return false;
+                    const exclusionList = EXCLUSIONS[person] || [];
+                    return !exclusionList.includes(target);
+                });
+                return targets;
+            },
+
+            async assignSecretFriend() {
+                const selectedPerson = document.getElementById('personSelect').value;
+                
+                if (!selectedPerson) {
+                    this.showError('sessionError', 'Selecciona tu nombre');
+                    return;
+                }
+
+                if (this.sessionData.assignments[selectedPerson]) {
+                    this.showResult(this.sessionData.assignments[selectedPerson]);
+                    this.hideError('sessionError');
+                    return;
+                }
+
+                const validTargets = this.getValidTargets(selectedPerson);
+
+                if (validTargets.length === 0) {
+                    this.showError('sessionError', 'No hay participantes disponibles.');
+                    return;
+                }
+
+                const randomIndex = Math.floor(Math.random() * validTargets.length);
+                const assignedFriend = validTargets[randomIndex];
+
+                try {
+                    this.sessionData.assignments[selectedPerson] = assignedFriend;
+                    this.sessionData.available = this.sessionData.available.filter(p => p !== assignedFriend);
+                    
+                    await this.updateBin(this.binId, this.sessionData);
+                    
+                    this.showResult(assignedFriend);
+                    this.hideError('sessionError');
+                    this.updateSessionView();
+                } catch (error) {
+                    this.showError('sessionError', 'Error al asignar: ' + error.message);
+                }
+            },
+
+            showResult(friendName) {
+                document.getElementById('revealedFriend').textContent = friendName;
+                document.getElementById('selectSection').classList.add('hidden');
+                document.getElementById('resultSection').classList.remove('hidden');
+            },
+
+            resetSession() {
+                if (confirm('¿Nueva sesión?')) {
+                    this.stopPolling();
+                    this.binId = null;
+                    this.sessionData = null;
+                    this.showView('setup');
+                    
+                    const grid = document.getElementById('namesGrid');
+                    grid.innerHTML = `
+                        <input type="text" class="input input-small" placeholder="Nombre 1">
+                        <input type="text" class="input input-small" placeholder="Nombre 2">
+                        <input type="text" class="input input-small" placeholder="Nombre 3">
+                    `;
+                    
+                    document.getElementById('selectSection').classList.remove('hidden');
+                    document.getElementById('resultSection').classList.add('hidden');
+                }
+            }
+        };
+    </script>
+</body>
+</html>
