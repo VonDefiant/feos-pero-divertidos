@@ -388,6 +388,11 @@
             .names-grid {
                 grid-template-columns: 1fr;
             }
+
+            .code-value {
+                font-size: 12px;
+                letter-spacing: 1px;
+            }
         }
     </style>
 </head>
@@ -402,9 +407,9 @@
             <div class="info-text">
                 <strong>📝 Instrucciones:</strong><br>
                 1. Ingresa los nombres de todos los participantes (mínimo 3)<br>
-                2. Se generará un código único<br>
+                2. Se generarán TODAS las asignaciones automáticamente<br>
                 3. Comparte el código UNA SOLA VEZ<br>
-                4. Todos usan el mismo código y se sincroniza automáticamente cada 3 segundos ✨
+                4. Todos usan el mismo código y se sincroniza cada 3 segundos ✨
             </div>
 
             <div class="form-group">
@@ -451,7 +456,7 @@
                     id="joinCode"
                     class="input"
                     placeholder="Ej: 67651ab5ad19ca34f8d3c8b9"
-                    style="text-align: center; font-size: 16px; font-family: monospace;"
+                    style="text-align: center; font-size: 14px; font-family: monospace;"
                 />
             </div>
 
@@ -479,7 +484,7 @@
             </div>
 
             <div class="info-text">
-                ✨ Comparte este código con los demás. Se actualiza automáticamente cada 3 segundos cuando alguien revela su amigo secreto.
+                ✨ Comparte este código con los demás. Cada persona selecciona su nombre y revela su amigo secreto. Se actualiza automáticamente cada 3 segundos.
             </div>
 
             <div id="selectSection">
@@ -511,10 +516,10 @@
             <div class="participants-status">
                 <div class="status-title">Estado de Participantes:</div>
                 <div>
-                    <strong>Asignados:</strong> <span id="assignedCount">0</span> de <span id="totalCount">0</span>
+                    <strong>Han revelado:</strong> <span id="assignedCount">0</span> de <span id="totalCount">0</span>
                 </div>
                 <div>
-                    <strong>Disponibles para asignar:</strong> <span id="availableCount">0</span>
+                    <strong>Falta revelar:</strong> <span id="availableCount">0</span>
                 </div>
             </div>
 
@@ -527,18 +532,18 @@
     <script>
         // Configuración de JSONBin.io
         const JSONBIN_CONFIG = {
-            masterKey: '$2a$10$edBhv0ItC665Z6m4Ldxhmu84l4wbzPHLJPse2dbfJOPGmMQQkz6.q',
+            masterKey: '$2a$10$edBhv0ItC665Z6m4Ldxhmu84l4wbzPHLJPse2dbfJOPGmQQkz6.q',
             accessKey: '$2a$10$tjJJemGEMGj0/SMP4A4IiOnqnd6gs6oaFZxfGN8XJS7XIOPiQQDSC',
             apiUrl: 'https://api.jsonbin.io/v3/b'
         };
 
-        // REGLAS DE EXCLUSIÓN
+        // ✅ REGLAS DE EXCLUSIÓN CORREGIDAS
         const EXCLUSIONS = {
-            'Diego': ['Amely', 'Darcy'],
-            'Darcy': ['Amely', 'Diego'],
-            'Amely': ['Diego', 'Darcy'],
-            'Carlos': ['Gaby'],
-            'Gaby': ['Carlos']
+            'Diego': ['Amely'],           // Diego NO puede darle a Amely (SÍ puede a Darcy ✓)
+            'Darcy': ['Amely'],           // Darcy NO puede darle a Amely (SÍ puede a Diego ✓)
+            'Amely': ['Diego', 'Darcy'],  // Amely NO puede darle ni a Diego ni a Darcy
+            'Carlos': ['Gaby'],           // Carlos NO puede darle a Gaby
+            'Gaby': ['Carlos']            // Gaby NO puede darle a Carlos
         };
 
         // Aplicación
@@ -600,6 +605,48 @@
                 return result.record;
             },
 
+            // ALGORITMO DE ASIGNACIÓN COMPLETA (evita deadlocks)
+            // Pre-genera TODAS las asignaciones al crear la sesión
+            generateCompleteAssignment(participants) {
+                // Intentar hasta 1000 veces encontrar una asignación válida
+                for (let attempt = 0; attempt < 1000; attempt++) {
+                    // Mezclar participantes aleatoriamente
+                    const shuffled = [...participants].sort(() => Math.random() - 0.5);
+                    const assignments = {};
+                    let valid = true;
+
+                    // Asignar en círculo: persona[i] → persona[i+1]
+                    for (let i = 0; i < shuffled.length; i++) {
+                        const giver = shuffled[i];
+                        const receiver = shuffled[(i + 1) % shuffled.length];
+                        
+                        // Verificar que no sea él mismo
+                        if (giver === receiver) {
+                            valid = false;
+                            break;
+                        }
+                        
+                        // Verificar exclusiones
+                        const exclusionList = EXCLUSIONS[giver] || [];
+                        if (exclusionList.includes(receiver)) {
+                            valid = false;
+                            break;
+                        }
+                        
+                        assignments[giver] = receiver;
+                    }
+
+                    if (valid) {
+                        console.log('✅ Asignaciones generadas en intento', attempt + 1);
+                        return assignments;
+                    }
+                }
+
+                // Si después de 1000 intentos no se logra, devolver null
+                console.error('❌ No se pudo generar asignaciones válidas después de 1000 intentos');
+                return null;
+            },
+
             addNameField() {
                 const grid = document.getElementById('namesGrid');
                 const input = document.createElement('input');
@@ -654,20 +701,33 @@
                     return;
                 }
 
+                // GENERAR TODAS LAS ASIGNACIONES AL INICIO
+                console.log('🎲 Generando asignaciones para:', names);
+                const completeAssignments = this.generateCompleteAssignment(names);
+                
+                if (!completeAssignments) {
+                    this.showError('setupError', '❌ No se pudo generar asignaciones válidas con estas exclusiones.\n\nPor favor intenta con:\n• Diferentes participantes\n• Menos restricciones');
+                    return;
+                }
+
+                console.log('✅ Asignaciones completas:', completeAssignments);
+
                 this.sessionData = {
                     participants: names,
-                    assignments: {},
-                    available: names,
+                    assignments: completeAssignments, // Ya están todas asignadas
+                    revealed: {}, // Quién ha revelado su asignación
                     createdAt: Date.now()
                 };
 
                 try {
                     this.binId = await this.createBin(this.sessionData);
+                    console.log('✅ Sesión creada con Bin ID:', this.binId);
                     this.startPolling();
                     this.updateSessionView();
                     this.showView('session');
                     this.hideError('setupError');
                 } catch (error) {
+                    console.error('❌ Error creando sesión:', error);
                     this.showError('setupError', 'Error al crear la sesión: ' + error.message);
                 }
             },
@@ -676,6 +736,8 @@
                 if (this.pollingInterval) {
                     clearInterval(this.pollingInterval);
                 }
+
+                console.log('🔄 Polling iniciado - sincronización cada 3 segundos');
 
                 this.pollingInterval = setInterval(async () => {
                     if (this.binId) {
@@ -694,6 +756,7 @@
                 if (this.pollingInterval) {
                     clearInterval(this.pollingInterval);
                     this.pollingInterval = null;
+                    console.log('⏹️ Polling detenido');
                 }
             },
 
@@ -706,11 +769,12 @@
                 const currentValue = select.value;
                 select.innerHTML = '<option value="">-- Elige tu nombre --</option>';
                 
-                const availableToSelect = this.sessionData.participants.filter(
-                    p => !this.sessionData.assignments[p]
+                // Mostrar solo personas que NO han revelado todavía
+                const unrevealed = this.sessionData.participants.filter(
+                    p => !this.sessionData.revealed[p]
                 );
                 
-                availableToSelect.forEach(person => {
+                unrevealed.forEach(person => {
                     const option = document.createElement('option');
                     option.value = person;
                     option.textContent = person;
@@ -719,11 +783,14 @@
 
                 select.value = currentValue;
 
-                document.getElementById('assignedCount').textContent = Object.keys(this.sessionData.assignments).length;
+                // Actualizar contadores
+                const revealedCount = Object.keys(this.sessionData.revealed).length;
+                document.getElementById('assignedCount').textContent = revealedCount;
                 document.getElementById('totalCount').textContent = this.sessionData.participants.length;
-                document.getElementById('availableCount').textContent = this.sessionData.available.length;
+                document.getElementById('availableCount').textContent = unrevealed.length;
 
-                if (currentValue && this.sessionData.assignments[currentValue]) {
+                // Si ya reveló, mostrar su resultado
+                if (currentValue && this.sessionData.revealed[currentValue]) {
                     this.showResult(this.sessionData.assignments[currentValue]);
                 }
             },
@@ -747,14 +814,17 @@
                 }
 
                 try {
+                    console.log('🚪 Uniéndose a sesión:', code);
                     const data = await this.readBin(code);
                     this.binId = code;
                     this.sessionData = data;
+                    console.log('✅ Sesión encontrada:', data);
                     this.startPolling();
                     this.updateSessionView();
                     this.showView('session');
                     this.hideError('joinError');
                 } catch (error) {
+                    console.error('❌ Error uniéndose:', error);
                     this.showError('joinError', 'Código no encontrado o error al conectar: ' + error.message);
                 }
             },
@@ -762,19 +832,11 @@
             copyCode() {
                 const code = document.getElementById('sessionCode').textContent;
                 navigator.clipboard.writeText(code).then(() => {
-                    alert('¡Código copiado!\n\n' + code);
+                    console.log('📋 Código copiado');
+                    alert('¡Código copiado!\n\n' + code + '\n\nCompártelo con los demás participantes.');
                 }).catch(() => {
-                    alert('Código de sesión:\n\n' + code);
+                    alert('Código de sesión:\n\n' + code + '\n\nCopia este código y compártelo con los demás participantes.');
                 });
-            },
-
-            getValidTargets(person) {
-                const targets = this.sessionData.available.filter(target => {
-                    if (target === person) return false;
-                    const exclusionList = EXCLUSIONS[person] || [];
-                    return !exclusionList.includes(target);
-                });
-                return targets;
             },
 
             async assignSecretFriend() {
@@ -785,44 +847,44 @@
                     return;
                 }
 
-                if (this.sessionData.assignments[selectedPerson]) {
+                // Si ya reveló, solo mostrar el resultado
+                if (this.sessionData.revealed[selectedPerson]) {
+                    console.log('ℹ️', selectedPerson, 'ya reveló anteriormente');
                     this.showResult(this.sessionData.assignments[selectedPerson]);
                     this.hideError('sessionError');
                     return;
                 }
 
-                const validTargets = this.getValidTargets(selectedPerson);
-
-                if (validTargets.length === 0) {
-                    this.showError('sessionError', 'No hay participantes disponibles.');
-                    return;
-                }
-
-                const randomIndex = Math.floor(Math.random() * validTargets.length);
-                const assignedFriend = validTargets[randomIndex];
+                // La asignación ya existe desde el inicio, solo marcar como revelada
+                const assignedFriend = this.sessionData.assignments[selectedPerson];
+                console.log('🎁', selectedPerson, 'revela a:', assignedFriend);
 
                 try {
-                    this.sessionData.assignments[selectedPerson] = assignedFriend;
-                    this.sessionData.available = this.sessionData.available.filter(p => p !== assignedFriend);
+                    // Marcar como revelado
+                    this.sessionData.revealed[selectedPerson] = true;
                     
                     await this.updateBin(this.binId, this.sessionData);
+                    console.log('✅ Actualización guardada');
                     
                     this.showResult(assignedFriend);
                     this.hideError('sessionError');
                     this.updateSessionView();
                 } catch (error) {
-                    this.showError('sessionError', 'Error al asignar: ' + error.message);
+                    console.error('❌ Error al revelar:', error);
+                    this.showError('sessionError', 'Error al revelar: ' + error.message);
                 }
             },
 
             showResult(friendName) {
+                console.log('🎉 Mostrando resultado');
                 document.getElementById('revealedFriend').textContent = friendName;
                 document.getElementById('selectSection').classList.add('hidden');
                 document.getElementById('resultSection').classList.remove('hidden');
             },
 
             resetSession() {
-                if (confirm('¿Nueva sesión?')) {
+                if (confirm('¿Crear una nueva sesión? Se perderán todas las asignaciones actuales.')) {
+                    console.log('🔄 Reiniciando sesión');
                     this.stopPolling();
                     this.binId = null;
                     this.sessionData = null;
@@ -840,6 +902,9 @@
                 }
             }
         };
+
+        console.log('🎁 Amigo Secreto - Inicializado');
+        console.log('📝 Reglas de exclusión actualizadas:', EXCLUSIONS);
     </script>
 </body>
 </html>
